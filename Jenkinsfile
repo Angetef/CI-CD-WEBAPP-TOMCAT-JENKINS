@@ -1,45 +1,39 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven'
-    }
-
     stages {
 
-        stage('Clone Repository') {
+        stage('Cloner le code') {
             steps {
-                git branch: 'main', url: 'https://github.com/Angetef/CI-CD-WEBAPP-TOMCAT-JENKINS.git'
+                echo 'Clonage du projet...'
+                checkout scm
             }
         }
 
-        stage('Build Project') {
+        stage('Build avec Maven') {
             steps {
+                echo 'Compilation du projet...'
                 bat 'mvn clean package'
             }
         }
 
-        stage('Run Tests') {
+        stage('Déploiement sur Tomcat') {
             steps {
-                bat 'mvn test'
-            }
-        }
-
-        stage('Deploy to Tomcat') {
-            steps {
+                echo 'Déploiement vers Tomcat...'
                 bat '''
-                copy /Y target\\monwebapp.war "C:\\tomcat\\apache-tomcat-10.1.52-windows-x64\\apache-tomcat-10.1.52\\webapps"
+                copy /Y target\\monwebapp.war C:\\tomcat\\apache-tomcat-10.1.52-windows-x64\\apache-tomcat-10.1.52\\webapps
                 '''
             }
         }
+
     }
 
     post {
         success {
-            echo 'Déploiement réussi sur Tomcat'
+            echo 'Déploiement réussi 🚀'
         }
         failure {
-            echo 'Pipeline échoué'
+            echo 'Échec du pipeline ❌'
         }
     }
 }
